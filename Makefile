@@ -1,5 +1,5 @@
 # Include values from .env file
-include .env
+# include .env
 
 # ================================================================================
 # HELPERS
@@ -25,7 +25,7 @@ confirm:
 ## run: run the ./cmd/api/ application
 .PHONY: run
 run:
-	go run ./cmd/api -dsn=${DATABASE_URL}
+	go run ./cmd/api
 
 
 ## db/migrations/new name=$1: creates a new database migration
@@ -38,13 +38,13 @@ db/migrations/new:
 .PHONY: db/migrations/up
 db/migrations/up: confirm
 	@echo 'Running up migrations...'
-	goose -dir=migrations sqlite ${DATABASE_URL} up
+	goose -dir=migrations sqlite ./spotfinder.db up
 
 ## db/migrations/down: apply all down database migrations
 .PHONY: db/migrations/down
 db/migrations/down:
 	@echo 'Running down migrations...'
-	goose -dir=migrations sqlite ${DATABASE_URL} down
+	goose -dir=migrations sqlite ./spotfinder.db down
 
 
 
@@ -66,7 +66,7 @@ audit:
 	go vet ./...
 
 	@echo 'Running tests...'
-	go test ./... -count=1
+	go test ./... -v -count=1
 
 
 
