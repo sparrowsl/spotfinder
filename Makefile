@@ -32,19 +32,19 @@ run:
 .PHONY: db/migrations/new
 db/migrations/new:
 	@echo 'Creating migration files for ${name}'
-	goose -dir=migrations create ${name} sql
+	goose -dir=./internal/schema create ${name} sql
 
 ## db/migrations/up: apply all up database migrations
 .PHONY: db/migrations/up
 db/migrations/up: confirm
 	@echo 'Running up migrations...'
-	goose -dir=migrations sqlite ./spotfinder.db up
+	goose -dir=./internal/schema sqlite ./spotfinder.db up
 
 ## db/migrations/down: apply all down database migrations
 .PHONY: db/migrations/down
 db/migrations/down:
 	@echo 'Running down migrations...'
-	goose -dir=migrations sqlite ./spotfinder.db down
+	goose -dir=./internal/schema sqlite ./spotfinder.db down
 
 
 
