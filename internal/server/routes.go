@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func routes() *chi.Mux {
+func (app *Application) routes() *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
@@ -19,21 +19,23 @@ func routes() *chi.Mux {
 	router.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Header().Set("Content-Type", "application/json")
-		message := fmt.Sprintf("%s does not exists or not implemented yet!!", r.URL)
+		message := fmt.Sprintf("%s does not exists or not implemented!!", r.URL)
 		json.NewEncoder(w).Encode(map[string]any{"error": message})
 	})
 
-	router.Mount("/v1", v1Routes())
+	router.Mount("/v1", app.v1())
 
 	return router
 }
 
-func v1Routes() *chi.Mux {
-	v1Routes := chi.NewRouter()
+func (app *Application) v1() *chi.Mux {
+	v1 := chi.NewRouter()
 
-	v1Routes.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	v1.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]any{"message": "This was fun!!"})
 	})
 
-	return v1Routes
+	v1.Get("/locations", app.getLocations)
+
+	return v1
 }
