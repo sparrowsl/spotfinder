@@ -1,4 +1,4 @@
-package handlers
+package server
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func RegisterRoutes() *chi.Mux {
+func routes() *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
@@ -17,8 +17,10 @@ func RegisterRoutes() *chi.Mux {
 	router.Use(middleware.CleanPath)
 	router.Use(middleware.StripSlashes)
 	router.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Header().Set("Content-Type", "application/json")
 		message := fmt.Sprintf("%s does not exists or not implemented yet!!", r.URL)
-		WriteJSON(w, http.StatusNotFound, map[string]any{"error": message})
+		json.NewEncoder(w).Encode(map[string]any{"error": message})
 	})
 
 	router.Mount("/v1", v1Routes())

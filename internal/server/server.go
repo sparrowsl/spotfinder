@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"spotfinder/internal/database"
-	"spotfinder/internal/server/handlers"
 
 	_ "modernc.org/sqlite"
 )
@@ -26,7 +25,7 @@ func NewServer() *http.Server {
 	app := &Application{
 		db:     database.New(newDB()),
 		port:   *port,
-		routes: handlers.RegisterRoutes(),
+		routes: routes(),
 	}
 
 	server := &http.Server{
