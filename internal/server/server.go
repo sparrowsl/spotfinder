@@ -1,17 +1,17 @@
 package server
 
 import (
-	"database/sql"
 	"flag"
 	"fmt"
 	"net/http"
 	"time"
 
+	"spotfinder/internal/database"
 	"spotfinder/internal/server/handlers"
 )
 
 type Application struct {
-	db     *sql.DB // TODO: change after running SQLC
+	db     *database.Queries
 	port   int
 	routes http.Handler
 }
@@ -20,7 +20,7 @@ func NewServer() *http.Server {
 	port := flag.Int("port", 5000, "Port to run the application on (default is 5000)")
 
 	app := &Application{
-		db:     newDB(),
+		db:     database.New(newDB()),
 		port:   *port,
 		routes: handlers.RegisterRoutes(),
 	}
