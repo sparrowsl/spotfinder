@@ -1,13 +1,17 @@
 package server
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"spotfinder/internal/database"
 	"spotfinder/internal/server/handlers"
+
+	_ "modernc.org/sqlite"
 )
 
 type Application struct {
@@ -34,4 +38,25 @@ func NewServer() *http.Server {
 	}
 
 	return server
+}
+
+var dbName = "spotfinder.db"
+
+func newDB() *sql.DB {
+	// TODO: accept database from flags
+	// TODO: check if accepted name is an actual database that ends in ".db"
+
+	db, err := sql.Open("sqlite", dbName)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	// Check if connection to db is open/valid
+	if err := db.Ping(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	return db
 }
