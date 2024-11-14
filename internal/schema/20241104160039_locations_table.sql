@@ -2,8 +2,8 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS locations (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  latitude INTEGER NOT NULL,
-  longitude INTEGER NOT NULL,
+  latitude FLOAT NOT NULL,
+  longitude FLOAT NOT NULL,
   address TEXT NOT NULL,
   category VARCHAR(100),
   description TEXT,

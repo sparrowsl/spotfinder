@@ -10,8 +10,8 @@ import (
 
 type Location struct {
 	ID          int64          `db:"id" json:"id"`
-	Latitude    int64          `db:"latitude" json:"latitude"`
-	Longitude   int64          `db:"longitude" json:"longitude"`
+	Latitude    float64        `db:"latitude" json:"latitude"`
+	Longitude   float64        `db:"longitude" json:"longitude"`
 	Address     string         `db:"address" json:"address"`
 	Category    sql.NullString `db:"category" json:"category"`
 	Description sql.NullString `db:"description" json:"description"`
