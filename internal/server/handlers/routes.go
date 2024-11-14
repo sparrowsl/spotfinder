@@ -18,9 +18,7 @@ func RegisterRoutes() *chi.Mux {
 	router.Use(middleware.StripSlashes)
 	router.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		message := fmt.Sprintf("%s does not exists or not implemented yet!!", r.URL)
-		w.WriteHeader(http.StatusNotFound)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{"error": message})
+		WriteJSON(w, http.StatusNotFound, map[string]any{"error": message})
 	})
 
 	router.Mount("/v1", v1Routes())
