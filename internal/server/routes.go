@@ -36,6 +36,7 @@ func (app *Application) v1() *chi.Mux {
 	})
 
 	v1.Get("/locations", app.getLocations)
+	v1.Post("/locations", app.addLocation)
 
 	return v1
 }
