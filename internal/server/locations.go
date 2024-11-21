@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"spotfinder/internal/database"
 	"spotfinder/internal/models"
 	"time"
 
@@ -14,7 +15,7 @@ func (app *Application) getLocations(writer http.ResponseWriter, request *http.R
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	locations, err := app.db.GetAllLocations(ctx)
+	locations, err := app.db.GetLocations(ctx)
 	if err != nil {
 		jsonResp(writer, http.StatusInternalServerError, map[string]any{"error": err.Error()})
 		return
@@ -30,13 +31,27 @@ func (app *Application) addLocation(writer http.ResponseWriter, request *http.Re
 		"latitude":    z.Float().Required(),
 		"longitude":   z.Float().Required(),
 		"address":     z.String().Trim().Min(6).Required(),
-		"category":    z.String().Trim().Min(4).Required(),
+		"category":    z.String().Trim(),
 		"description": z.String().Trim(),
 	})
 	if err := locationSchema.Parse(zhttp.Request(request), &input); err != nil {
 		jsonResp(writer, http.StatusBadRequest, map[string]any{"error": err})
 		return
 	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
 
-	jsonResp(writer, http.StatusOK, map[string]any{"location": input})
+	location, err := app.db.AddLocations(ctx, database.AddLocationsParams{
+		Address:     input.Address,
+		Latitude:    input.Latitude,
+		Longitude:   input.Longitude,
+		Category:    input.Category,
+		Description: &input.Description,
+	})
+	if err != nil {
+		jsonResp(writer, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+		return
+	}
+
+	jsonResp(writer, http.StatusOK, map[string]any{"location": location})
 }

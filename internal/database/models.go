@@ -5,16 +5,16 @@
 package database
 
 import (
-	"database/sql"
+	"time"
 )
 
 type Location struct {
-	ID          int64          `db:"id" json:"id"`
-	Latitude    float64        `db:"latitude" json:"latitude"`
-	Longitude   float64        `db:"longitude" json:"longitude"`
-	Address     string         `db:"address" json:"address"`
-	Category    sql.NullString `db:"category" json:"category"`
-	Description sql.NullString `db:"description" json:"description"`
-	CreatedAt   sql.NullTime   `db:"created_at" json:"created_at"`
-	UpdatedAt   sql.NullTime   `db:"updated_at" json:"updated_at"`
+	ID          int64      `db:"id" json:"id"`
+	Latitude    float64    `db:"latitude" json:"latitude"`
+	Longitude   float64    `db:"longitude" json:"longitude"`
+	Address     string     `db:"address" json:"address"`
+	Category    string     `db:"category" json:"category"`
+	Description *string    `db:"description" json:"description"`
+	CreatedAt   *time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at"`
 }

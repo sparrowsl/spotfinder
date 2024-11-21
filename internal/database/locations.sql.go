@@ -7,26 +7,76 @@ package database
 
 import (
 	"context"
+	"time"
 )
 
-const getAllLocations = `-- name: GetAllLocations :many
-SELECT id, latitude, longitude, address, category, description, created_at, updated_at FROM locations
+const addLocations = `-- name: AddLocations :one
+INSERT INTO locations
+    (address, latitude, longitude, category, description)
+VALUES (?, ?, ?, ?, ?)
+RETURNING id, latitude, longitude, address, category, description, created_at, updated_at
 `
 
-func (q *Queries) GetAllLocations(ctx context.Context) ([]Location, error) {
-	rows, err := q.db.QueryContext(ctx, getAllLocations)
+type AddLocationsParams struct {
+	Address     string  `db:"address" json:"address"`
+	Latitude    float64 `db:"latitude" json:"latitude"`
+	Longitude   float64 `db:"longitude" json:"longitude"`
+	Category    string  `db:"category" json:"category"`
+	Description *string `db:"description" json:"description"`
+}
+
+func (q *Queries) AddLocations(ctx context.Context, arg AddLocationsParams) (Location, error) {
+	row := q.db.QueryRowContext(ctx, addLocations,
+		arg.Address,
+		arg.Latitude,
+		arg.Longitude,
+		arg.Category,
+		arg.Description,
+	)
+	var i Location
+	err := row.Scan(
+		&i.ID,
+		&i.Latitude,
+		&i.Longitude,
+		&i.Address,
+		&i.Category,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getLocations = `-- name: GetLocations :many
+SELECT  id, address, latitude, longitude, category, description, created_at, updated_at
+FROM locations
+`
+
+type GetLocationsRow struct {
+	ID          int64      `db:"id" json:"id"`
+	Address     string     `db:"address" json:"address"`
+	Latitude    float64    `db:"latitude" json:"latitude"`
+	Longitude   float64    `db:"longitude" json:"longitude"`
+	Category    string     `db:"category" json:"category"`
+	Description *string    `db:"description" json:"description"`
+	CreatedAt   *time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at"`
+}
+
+func (q *Queries) GetLocations(ctx context.Context) ([]GetLocationsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getLocations)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Location{}
+	items := []GetLocationsRow{}
 	for rows.Next() {
-		var i Location
+		var i GetLocationsRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Address,
 			&i.Latitude,
 			&i.Longitude,
-			&i.Address,
 			&i.Category,
 			&i.Description,
 			&i.CreatedAt,
