@@ -21,7 +21,7 @@ type AddLocationsParams struct {
 	Address     string  `db:"address" json:"address"`
 	Latitude    float64 `db:"latitude" json:"latitude"`
 	Longitude   float64 `db:"longitude" json:"longitude"`
-	Category    string  `db:"category" json:"category"`
+	Category    *string `db:"category" json:"category"`
 	Description *string `db:"description" json:"description"`
 }
 
@@ -57,7 +57,7 @@ type GetLocationsRow struct {
 	Address     string     `db:"address" json:"address"`
 	Latitude    float64    `db:"latitude" json:"latitude"`
 	Longitude   float64    `db:"longitude" json:"longitude"`
-	Category    string     `db:"category" json:"category"`
+	Category    *string    `db:"category" json:"category"`
 	Description *string    `db:"description" json:"description"`
 	CreatedAt   *time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at"`
@@ -93,4 +93,41 @@ func (q *Queries) GetLocations(ctx context.Context) ([]GetLocationsRow, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateLocation = `-- name: UpdateLocation :one
+UPDATE locations
+SET latitude = ?, longitude = ?, description = ?, category = ?
+WHERE id = ?
+RETURNING id, latitude, longitude, address, category, description, created_at, updated_at
+`
+
+type UpdateLocationParams struct {
+	Latitude    float64 `db:"latitude" json:"latitude"`
+	Longitude   float64 `db:"longitude" json:"longitude"`
+	Description *string `db:"description" json:"description"`
+	Category    *string `db:"category" json:"category"`
+	ID          int64   `db:"id" json:"id"`
+}
+
+func (q *Queries) UpdateLocation(ctx context.Context, arg UpdateLocationParams) (Location, error) {
+	row := q.db.QueryRowContext(ctx, updateLocation,
+		arg.Latitude,
+		arg.Longitude,
+		arg.Description,
+		arg.Category,
+		arg.ID,
+	)
+	var i Location
+	err := row.Scan(
+		&i.ID,
+		&i.Latitude,
+		&i.Longitude,
+		&i.Address,
+		&i.Category,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

@@ -45,7 +45,7 @@ func (app *Application) addLocation(writer http.ResponseWriter, request *http.Re
 		Address:     input.Address,
 		Latitude:    input.Latitude,
 		Longitude:   input.Longitude,
-		Category:    input.Category,
+		Category:    &input.Category,
 		Description: &input.Description,
 	})
 	if err != nil {

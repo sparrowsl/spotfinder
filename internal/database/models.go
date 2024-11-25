@@ -13,7 +13,7 @@ type Location struct {
 	Latitude    float64    `db:"latitude" json:"latitude"`
 	Longitude   float64    `db:"longitude" json:"longitude"`
 	Address     string     `db:"address" json:"address"`
-	Category    string     `db:"category" json:"category"`
+	Category    *string    `db:"category" json:"category"`
 	Description *string    `db:"description" json:"description"`
 	CreatedAt   *time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at"`
