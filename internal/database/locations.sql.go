@@ -48,7 +48,7 @@ func (q *Queries) AddLocations(ctx context.Context, arg AddLocationsParams) (Loc
 }
 
 const getLocations = `-- name: GetLocations :many
-SELECT  id, address, latitude, longitude, category, description, created_at, updated_at
+SELECT id, address, latitude, longitude, category, description, created_at, updated_at
 FROM locations
 `
 
@@ -72,6 +72,56 @@ func (q *Queries) GetLocations(ctx context.Context) ([]GetLocationsRow, error) {
 	items := []GetLocationsRow{}
 	for rows.Next() {
 		var i GetLocationsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Address,
+			&i.Latitude,
+			&i.Longitude,
+			&i.Category,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getLocationsByCategory = `-- name: GetLocationsByCategory :many
+SELECT id, address, latitude, longitude, category, description, created_at, updated_at
+FROM locations
+WHERE category LIKE ?
+ORDER BY created_at DESC
+`
+
+type GetLocationsByCategoryRow struct {
+	ID          int64      `db:"id" json:"id"`
+	Address     string     `db:"address" json:"address"`
+	Latitude    float64    `db:"latitude" json:"latitude"`
+	Longitude   float64    `db:"longitude" json:"longitude"`
+	Category    *string    `db:"category" json:"category"`
+	Description *string    `db:"description" json:"description"`
+	CreatedAt   *time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at"`
+}
+
+func (q *Queries) GetLocationsByCategory(ctx context.Context, category *string) ([]GetLocationsByCategoryRow, error) {
+	rows, err := q.db.QueryContext(ctx, getLocationsByCategory, category)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetLocationsByCategoryRow{}
+	for rows.Next() {
+		var i GetLocationsByCategoryRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Address,

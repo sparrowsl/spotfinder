@@ -17,10 +17,8 @@ func (app *Application) routes() *chi.Mux {
 	router.Use(middleware.CleanPath)
 	router.Use(middleware.StripSlashes)
 	router.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-		w.Header().Set("Content-Type", "application/json")
-		message := fmt.Sprintf("%s does not exists or not implemented!!", r.URL)
-		json.NewEncoder(w).Encode(map[string]any{"error": message})
+		message := fmt.Sprintf("%s with %s method does not exists!!", r.URL, r.Method)
+		jsonResp(w, http.StatusNotFound, map[string]any{"error": message})
 	})
 
 	router.Mount("/v1", app.v1())

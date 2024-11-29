@@ -1,6 +1,13 @@
 -- name: GetLocations :many
-SELECT  id, address, latitude, longitude, category, description, created_at, updated_at
+SELECT id, address, latitude, longitude, category, description, created_at, updated_at
 FROM locations;
+
+
+-- name: GetLocationsByCategory :many
+SELECT id, address, latitude, longitude, category, description, created_at, updated_at
+FROM locations
+WHERE category LIKE ?
+ORDER BY created_at DESC;
 
 
 -- name: AddLocations :one

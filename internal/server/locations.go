@@ -12,16 +12,28 @@ import (
 )
 
 func (app *Application) getLocations(writer http.ResponseWriter, request *http.Request) {
+	category := request.URL.Query().Get("category")
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	locations, err := app.db.GetLocations(ctx)
-	if err != nil {
-		jsonResp(writer, http.StatusInternalServerError, map[string]any{"error": err.Error()})
-		return
-	}
+	if category != "" {
+		locations, err := app.db.GetLocationsByCategory(ctx, &category)
+		if err != nil {
+			jsonResp(writer, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+			return
+		}
 
-	jsonResp(writer, http.StatusOK, map[string]any{"locations": locations})
+		jsonResp(writer, http.StatusOK, map[string]any{"locations": locations})
+	} else {
+		locations, err := app.db.GetLocations(ctx)
+		if err != nil {
+			jsonResp(writer, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+			return
+		}
+
+		jsonResp(writer, http.StatusOK, map[string]any{"locations": locations})
+	}
 }
 
 func (app *Application) addLocation(writer http.ResponseWriter, request *http.Request) {

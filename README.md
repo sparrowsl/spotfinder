@@ -3,16 +3,17 @@
 An API to display locations/spots of different institutions, places in Sierra Leone
 
 ### Tasks to complete
+> tasks with * are undecided yet
+
 - [X] Display all locations
 - [X] Add new locations
 - [ ] Filter locations
-  - [ ] By category
-  - [ ] By tags _(not added yet)_(*)
+  - [X] By category
+  - [ ] By tags _(not planned yet)_(*)
 - [ ] Add user authentications to update locations(*)
 - [ ] Mark location as valid/invalid - then delete if invalid(*)
 - [ ] Add a flag to seed data on startup.
 
-> tasks with * are undecided yet
 
 ### Requirements
 Tools required to contribute or build the project locally.
